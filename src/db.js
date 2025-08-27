@@ -95,7 +95,7 @@ async function insertarDatosEjemplo() {
     // Insertar items
     await pool.query(`
       INSERT INTO items (name, type_id, price) VALUES 
-      ('Windows 10 Pro', 1, 1500.00),
+      ('USB Kyson 256GB 3.2', 1, 79900.00),
       ('Licencia Office 365', 4, 800.00),
       ('Servidor Dell R740', 2, 25000.00),
       ('Mantenimiento mensual', 3, 5000.00),
