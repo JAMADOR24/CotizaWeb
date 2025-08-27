@@ -107,7 +107,7 @@ async function insertarDatosEjemplo() {
     // Insertar clientes
     await pool.query(`
       INSERT INTO clientes (nombre) VALUES 
-      ('Empresa ABC S.A. de C.V.'),
+      ('SYNERGIA INTERNACIONAL'),
       ('Tiendas XYZ México'),
       ('Servicios Corporativos LMN'),
       ('Consultoría Tech Solutions')
