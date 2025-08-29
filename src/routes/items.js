@@ -4,6 +4,20 @@ const db = require('../db');
 const { manejarError, formatearMoneda } = require('../utils/utils');
 
 /**
+ * @route   GET /api/items/tipos
+ * @desc    Obtener todos los tipos de items
+ * @access  Public
+ */
+router.get('/tipos', async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM item_types ORDER BY name');
+        res.json(result.rows);
+    } catch (error) {
+        manejarError(error, res, 'Error al obtener los tipos de items');
+    }
+});
+
+/**
  * @route   GET /api/items
  * @desc    Obtener todos los items 
  * @access  Public
@@ -71,7 +85,7 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { name, description, price, type_id } = req.body;
+    const { name, price, type_id } = req.body;
 
     // Validaciones
     if (!name || !name.trim()) {
@@ -93,14 +107,13 @@ router.post('/', async (req, res) => {
     }
 
     const query = `
-      INSERT INTO items (name, description, price, type_id)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO items (name, price, type_id)
+      VALUES ($1, $2, $3)
       RETURNING *
     `;
 
     const result = await db.query(query, [
       name.trim(),
-      description?.trim() || null,
       parseFloat(price),
       parseInt(type_id)
     ]);
@@ -258,39 +271,6 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'Item eliminado exitosamente' });
   } catch (error) {
     manejarError(error, res, 'Error al eliminar el item');
-  }
-});
-
-/**
- * @route   GET /api/items/tipos/count
- * @desc    Obtener conteo de items por tipo
- * @access  Public
- */
-router.get('/tipos/count', async (req, res) => {
-  try {
-    const query = `
-      SELECT 
-        it.id,
-        it.name as tipo,
-        COUNT(i.id) as cantidad_items,
-        COALESCE(SUM(i.price), 0) as valor_total
-      FROM item_types it
-      LEFT JOIN items i ON it.id = i.type_id
-      GROUP BY it.id, it.name
-      ORDER BY it.name
-    `;
-
-    const result = await db.query(query);
-    
-    const stats = result.rows.map(row => ({
-      ...row,
-      valor_total: parseFloat(row.valor_total),
-      valor_total_formatted: formatearMoneda(row.valor_total)
-    }));
-
-    res.json(stats);
-  } catch (error) {
-    manejarError(error, res, 'Error al obtener estadísticas por tipo');
   }
 });
 
